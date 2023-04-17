@@ -19,7 +19,7 @@ export const GetSrcActorForm: React.FC<GetSrcActorFormProps> = ({
 
   return (
     <div className={styles.container}>
-      <p className={styles.description}>コピー元アカウントのハンドルを入力</p>
+      <p className={styles.description}>フォローリストコピー元のハンドルを入力</p>
       <div>
         <input
           type="text"
