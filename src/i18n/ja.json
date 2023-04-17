@@ -1,0 +1,8 @@
+{
+  "ui": {
+    "loginIdent": "ハンドル or メールアドレス",
+    "loginPassword": "パスワード",
+    "login": "ログイン",
+    "followAll": "すべてフォロー"
+  }
+}

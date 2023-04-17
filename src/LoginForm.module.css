@@ -1,0 +1,21 @@
+.btnLogin {
+  height: 46px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 8px;
+  padding: 0.5em 1em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.btnLogin:hover {
+  border-color: #646cff;
+}
+.btnLogin:focus,
+.btnLogin:focus-visible {
+  outline: 2px auto -webkit-focus-ring-color;
+}

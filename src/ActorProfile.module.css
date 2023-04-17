@@ -1,0 +1,59 @@
+.container {
+  display: grid;
+  grid-template-areas: "avatar name";
+  grid-template-columns: 48px minmax(0, 1fr);
+  column-gap: 4px;
+  height: 48px;
+  width: fit-content;
+  margin: 0 auto;
+  align-items: center;
+  text-align: start;
+}
+
+.avatarArea {
+  grid-area: avatar;
+  display: flex;
+  margin: 0;
+}
+
+.avatarWrap {
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  margin: 4px 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    142deg,
+    rgba(0, 162, 230, 1) 0%,
+    rgba(2, 203, 251, 1) 70%,
+    rgba(52, 222, 255, 1) 100%
+  );
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.nameArea {
+  grid-area: name;
+  display: flex;
+}
+
+.displayName {
+  font-weight: bold;
+}
+
+.handle {
+  margin-left: 4px;
+  font-size: 0.8em;
+  color: #718081;
+}
+
+.followsCount {
+  margin-left: 4px;
+  font-size: 0.8em;
+  color: #0c9fe9;
+}

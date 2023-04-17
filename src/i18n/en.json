@@ -1,0 +1,8 @@
+{
+  "ui": {
+    "loginIdent": "Handle or E-mail Address",
+    "loginPassword": "Password",
+    "login": "Log in",
+    "followAll": "Follow All"
+  }
+}
