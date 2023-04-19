@@ -291,6 +291,8 @@ export const App = () => {
     session.current = undefined;
     localStorage.removeItem(LS_BSKY_SESS_KEY);
 
+    setMyActor(undefined);
+    setSrcActor(undefined);
     setFollowings([]);
     setMutes([]);
 
