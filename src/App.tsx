@@ -1,8 +1,8 @@
 import {
   AppBskyActorDefs,
-  AtpAgent,
   AtpSessionData,
   AtpSessionEvent,
+  BskyAgent,
 } from "@atproto/api";
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 import {
@@ -28,7 +28,7 @@ type GraphActor = AppBskyActorDefs.ProfileView;
 const LS_BSKY_SESS_KEY = "bsky_sess";
 // const LS_UI_LANG_KEY = "ui_lang";
 
-const atpAgent = new AtpAgent({
+const bskyAgent = new BskyAgent({
   service: "https://bsky.social",
   persistSession: (_: AtpSessionEvent, session: AtpSessionData | undefined) => {
     if (session !== undefined) {
@@ -36,8 +36,6 @@ const atpAgent = new AtpAgent({
     }
   },
 });
-
-const bsky = atpAgent.api.app.bsky;
 
 const isXRPCError = (err: unknown): err is XRPCError => {
   return (
@@ -58,7 +56,7 @@ const resumeSession = async (): Promise<AtpSessionData | undefined> => {
   console.log("resuming session...");
   try {
     const sess = JSON.parse(jsonBskySess) as AtpSessionData;
-    await atpAgent.resumeSession(sess);
+    await bskyAgent.resumeSession(sess);
     console.log("resumed session");
     return sess;
   } catch (err) {
@@ -89,8 +87,6 @@ const withResumeSession = async <T extends unknown>(
   }
 };
 
-const now = () => new Date().toISOString();
-
 type GetActorsResult = {
   actors: GraphActor[];
   cursor: string | undefined;
@@ -117,7 +113,7 @@ const getFollowingsStep = (
 ): ((cursor: string) => Promise<GetActorsResult>) => {
   return async (cursor: string) => {
     const resp = await withResumeSession(() =>
-      bsky.graph.getFollows({
+      bskyAgent.getFollows({
         actor: handle,
         cursor,
       })
@@ -127,42 +123,45 @@ const getFollowingsStep = (
 };
 
 const getMutesStep = async (cursor: string): Promise<GetActorsResult> => {
-  const resp = await withResumeSession(() => bsky.graph.getMutes({ cursor }));
+  const resp = await withResumeSession(() =>
+    bskyAgent.app.bsky.graph.getMutes({ cursor })
+  );
   return { actors: resp.data.mutes, cursor: resp.data.cursor };
 };
 
 const getProfile = async (handle: string) => {
   const { data: profile } = await withResumeSession(() => {
-    return bsky.actor.getProfile({
+    return bskyAgent.getProfile({
       actor: handle,
     });
   });
   return profile;
 };
 
-const followActor = async (myDid: string, targetDid: string) => {
-  await withResumeSession(() =>
-    bsky.graph.follow.create(
-      { repo: myDid },
-      { subject: targetDid, createdAt: now() }
-    )
-  );
+const followActor = async (targetDid: string) => {
+  await withResumeSession(() => bskyAgent.follow(targetDid));
 };
 
 type AppState =
   | "initial"
-  | "resumingSession"
   | "beforeLogin"
   | "loginInProgress"
   | "loginFailed"
   | "afterLogin";
 
+const messageForAppState = (s: AppState): string => {
+  switch (s) {
+    case "loginInProgress":
+      return "ログイン中...";
+    case "loginFailed":
+      return "ログインに失敗しました";
+    default:
+      return "";
+  }
+};
+
 const notLoggedIn = (s: AppState): boolean => {
-  const notLoggedInStates: AppState[] = [
-    "beforeLogin",
-    "loginInProgress",
-    "loginFailed",
-  ];
+  const notLoggedInStates: AppState[] = ["beforeLogin", "loginFailed"];
   return notLoggedInStates.includes(s);
 };
 
@@ -211,11 +210,12 @@ export const App = () => {
 
   const [myActor, setMyActor] = useState<FullActor | undefined>(undefined);
   const [srcActor, setSrcActor] = useState<FullActor | undefined>(undefined);
-  const [followings, setFollowings] = useState<GraphActor[]>([]);
-  const [mutes, setMutes] = useState<GraphActor[]>([]);
 
   const [includeSrcActor, setIncludeSrcActor] = useState(true);
   const [excludeMuted, setExcludeMuted] = useState(true);
+
+  const [followings, setFollowings] = useState<GraphActor[]>([]);
+  const [mutes, setMutes] = useState<GraphActor[]>([]);
 
   const [progress, setProgress] = useState<Progress>({ state: "pending" });
 
@@ -242,7 +242,7 @@ export const App = () => {
     setAppState("loginInProgress");
 
     try {
-      const loginResp = await atpAgent.login({
+      const loginResp = await bskyAgent.login({
         identifier: creds.email,
         password: creds.password,
       });
@@ -276,7 +276,7 @@ export const App = () => {
     // };
 
     const resumeSess = async () => {
-      setAppState("resumingSession");
+      setAppState("loginInProgress");
 
       const sess = await resumeSession();
       if (sess === undefined) {
@@ -356,7 +356,7 @@ export const App = () => {
       for (const actor of targetFollowList) {
         console.log(`following ${actor.handle}...`);
         try {
-          await followActor(session.current.did, actor.did);
+          await followActor(actor.did);
         } catch (err) {
           console.error(err);
         }
@@ -387,12 +387,15 @@ export const App = () => {
       <div className={styles.container}>
         <h1 className={styles.title}>Blue Mirage</h1>
         <div className={styles.main}>
+          <div>{messageForAppState(appState)}</div>
+
           {notLoggedIn(appState) && (
             <LoginForm
               onClickLogin={onClickLogin}
               loginInProgress={appState === "loginInProgress"}
             ></LoginForm>
           )}
+          
           {loggedIn(appState) && (
             <GetSrcActorForm onClickGetProfile={getSrcProfile} />
           )}
