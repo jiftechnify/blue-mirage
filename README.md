@@ -5,4 +5,4 @@ https://jiftechnify.github.io/blue-mirage/
 
 ## Other Bluesky Tools by Me
 
-- [Bluesky Follow Back All](https://jiftechnify.github.io/bsky-follow-back-all/) - A tiny web app for following back all of your followers on Bluesky Social.
+- [Bluesky Follow Back All](https://github.com/jiftechnify/bsky-follow-back-all) - A tiny web app for following back all of your followers on Bluesky Social.
