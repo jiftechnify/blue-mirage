@@ -390,10 +390,7 @@ export const App = () => {
           <div>{messageForAppState(appState)}</div>
 
           {notLoggedIn(appState) && (
-            <LoginForm
-              onClickLogin={onClickLogin}
-              loginInProgress={appState === "loginInProgress"}
-            ></LoginForm>
+            <LoginForm onClickLogin={onClickLogin}></LoginForm>
           )}
           
           {loggedIn(appState) && (

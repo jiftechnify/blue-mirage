@@ -6,12 +6,10 @@ import styles from "./LoginForm.module.css";
 
 type LoginFormProps = {
   onClickLogin: (creds: Crendentials) => void;
-  loginInProgress: boolean;
 };
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   onClickLogin,
-  loginInProgress,
 }) => {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
@@ -37,7 +35,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         className={styles.btnLogin}
         type="button"
         onClick={() => onClickLogin({ email, password })}
-        disabled={loginInProgress}
       >
         {t("ui.login")}
       </button>
