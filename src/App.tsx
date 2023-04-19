@@ -5,7 +5,14 @@ import {
   AtpSessionEvent,
 } from "@atproto/api";
 import { ResponseType, XRPCError } from "@atproto/xrpc";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { LoginForm } from "./LoginForm";
 import type { Crendentials, FullActor } from "./types";
 
@@ -393,28 +400,18 @@ export const App = () => {
             <div className={styles.copyWrap}>
               <CopyPreview src={srcActor} dst={myActor} />
               <div className={styles.checks}>
-                <div>
-                  <input
-                    id="follow-src-actor"
-                    type="checkbox"
-                    checked={includeSrcActor}
-                    onChange={() => setIncludeSrcActor((p) => !p)}
-                  />
-                  <label htmlFor="follow-src-actor">
-                    コピー元アカウントをフォローする
-                  </label>
-                </div>
-                <div>
-                  <input
-                    id="exclude-muted"
-                    type="checkbox"
-                    checked={excludeMuted}
-                    onChange={() => setExcludeMuted((p) => !p)}
-                  />
-                  <label htmlFor="exclude-muted">
-                    ミュート済みのアカウントをフォローしない
-                  </label>
-                </div>
+                <Checkbox
+                  id="follow-src-actor"
+                  label="コピー元アカウントをフォローする"
+                  checked={includeSrcActor}
+                  onChange={() => setIncludeSrcActor((p) => !p)}
+                />
+                <Checkbox
+                  id="exclude-muted"
+                  label="ミュート済みのアカウントをフォローしない"
+                  checked={excludeMuted}
+                  onChange={() => setExcludeMuted((p) => !p)}
+                />
               </div>
               <button
                 className={styles.followAll}
@@ -464,5 +461,26 @@ export const App = () => {
         </a>
       </div>
     </>
+  );
+};
+
+type CheckboxProps = {
+  id: string;
+  label: string;
+  checked: boolean;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+};
+
+const Checkbox: React.FC<CheckboxProps> = ({
+  id,
+  label,
+  checked,
+  onChange,
+}) => {
+  return (
+    <div>
+      <input id={id} type="checkbox" checked={checked} onChange={onChange} />
+      <label htmlFor={id}>{label}</label>
+    </div>
   );
 };
